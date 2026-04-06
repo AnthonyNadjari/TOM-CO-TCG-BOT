@@ -28,9 +28,15 @@ jobs:
       - name: Remove stale link (if any)
         run: rm -rf .vercel
 
+      - name: Bind Vercel project for CLI
+        env:
+          ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          PRJ_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          node -e "const fs=require('fs');fs.mkdirSync('.vercel',{recursive:true});fs.writeFileSync('.vercel/project.json',JSON.stringify({orgId:process.env.ORG_ID,projectId:process.env.PRJ_ID,projectName:'tom-co-tcg-bot'}));"
+
       - name: Install Vercel CLI (latest)
         run: npm install -g vercel@latest
 
-      # Remote build on Vercel (same idea as the old action, modern CLI)
-      - name: Deploy to production
+      - name: Deploy to production (remote build)
         run: vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
